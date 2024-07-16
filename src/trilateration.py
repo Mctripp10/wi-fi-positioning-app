@@ -11,9 +11,14 @@ import numpy as np
 import sys
 import pprint
 
-# Method used to calculate the intersection of 3 circles, or output a corresponding error otherwise
+'''
+Method used to calculate the intersection of 3 circles, or output a corresponding error otherwise
+    x# = center x coord of circle #
+    y# = center y coord of circle #
+    r# = radius of circle #
+'''
 def calc_3_circle_intersection(x1, y1, r1, x2, y2, r2, x3, y3, r3):
-    d = math.sqrt((x1-x2)**2 + (y1-y2)**2)                  # Cartesian distance
+    d = math.sqrt((x1-x2)**2 + (y1-y2)**2)                  # Cartesian distance between centers of circles 1 and 2
     
     if d == 0 and r1 == r2:
         raise ValueError("Error: Can't find intersection (2 circles are coincident)")
@@ -25,10 +30,12 @@ def calc_3_circle_intersection(x1, y1, r1, x2, y2, r2, x3, y3, r3):
     a = (r1**2 - r2**2 + d**2) / (2*d)
     h = math.sqrt(r1**2 - a**2)
     
-    c1 = np.array([x1, y1])             # Center of circle 1 & 2
-    c2 = np.array([x2, y2])             # Convert to numpy array to perform vector multiplication
+    # Centers of circles 1 and 2, converted to numpy arrays to perform vector multiplication
+    c1 = np.array([x1, y1])             
+    c2 = np.array([x2, y2])             
     
-    c3 = c1 + (a/d)*(c2-c1)             # Find c3 using c1 and c2
+     # Find center of circle 3 (c3) using c1 and c2
+    c3 = c1 + (a/d)*(c2-c1)            
     c3_x = c3[0]
     c3_y = c3[1]
     

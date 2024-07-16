@@ -2,9 +2,9 @@
 Michael Tripp
 CS 601/2 Capstone
 
-Description: program containing all main code for implementing
-the Wi-Fi trilateration algorithm and used to store access point
-data.
+Description: scans for nearby Wi-Fi access points (APs) and outputs an approximation
+of user device location on a map if 3 or more scanned APs match known APs BSSIDs.
+See SETUP / Configuration.
 '''
 
 import sys
@@ -16,39 +16,20 @@ import matplotlib.pyplot as plt
 import random
 from pprint import pprint
 
-sys.path.append('C:/Users/Admin/Documents/College/Fall 2022/CS601/Program')
-from windows_wlan_api import scan_APs
-from trilateration2 import trilaterate
+# sys.path.append('C:/Users/Admin/Documents/College/Fall 2022/CS601/Program')
+from src.windows_wlan_api import scan_APs
+from src.trilateration import trilaterate
 
 
-''' Methods '''
+''' SETUP '''
 
+# Configuration
 
-# Insertion sort algorithm to sort AP data by distance
-def sort_by_distance(a):
-    if (n := len(a)) <= 1:
-        return
-    for i in range(1, n):        
-        key = a[i]
-        
-        j = i-1
-        while j >= 0 and key[1] < a[j][1]:
-            a[j+1] = a[j]
-            j -= 1
-        a[j+1] = key
-        
-# Method that converts lat/lon coordinates into x and y for our predefined coordinate system in meters
-def convert_to_coords(lat, lon):
-    x = abs(lon - top_left_corner[1]) * 111320 * np.cos(41.117 * (np.pi/180))
-    y = abs(lat - bottom_right_corner[0]) * 110574
-    return x, y
+ONLY_SHOW_MATCHES = True                                            # Set to TRUE to only show on map the known APs that match to scanned APs, otherwise show all APs
+CONTINUOUS_SCAN = False                                             # Set to TRUE to continuously scan for APs and update user location in real-time, otherwise just scan once for current location
+map_img_path = "./resources/college_map_terrain.png"                # Map image to project coordinate plane with AP locations onto
 
-
-''' Setup '''
-
-
-# List of all known access point MAC addresses and lat/lon locations
-
+# List of all known access point MAC addresses (BSSIDs) and lat/lon locations
 known_APs = [
              ["E8:26:89:1E:06:40", 41.11900, -80.33260],   # MG.b.G03.i
              ["E8:26:89:1E:06:50", 41.11906, -80.33262],   # MG.AP72
@@ -76,79 +57,100 @@ bottom_right_corner = [41.117155, -80.327708]
 x_max = abs(top_left_corner[1] - bottom_right_corner[1]) * 111.320 * np.cos(41.117 * (np.pi/180)) * 1000
 y_max = abs(top_left_corner[0] - bottom_right_corner[0]) * 110.574 * 1000
 
-ONLY_SHOW_MATCHES = True
 
-if not ONLY_SHOW_MATCHES:
-    x_vals = []
-    y_vals = []
-    
-    for AP in known_APs:
-        x, y = convert_to_coords(AP[1], AP[2])
-        x_vals.append(x)
-        y_vals.append(y)
+''' METHODS '''
 
-    img = plt.imread("C:/Users/Admin/Documents/College/Fall 2022/CS601/Documentation/College_Map_Terrain.png")
-    fig, ax = plt.subplots()
+# Insertion sort algorithm to sort AP data by distance
+def sort_by_distance(a):
+    if (n := len(a)) <= 1:
+        return
+    for i in range(1, n):        
+        key = a[i]
         
-    ax.imshow(img, extent=[0, x_max, 0, y_max])
-    ax.plot(x_vals, y_vals, 'o', color='red', markersize = 1.5)
+        j = i-1
+        while j >= 0 and key[1] < a[j][1]:
+            a[j+1] = a[j]
+            j -= 1
+        a[j+1] = key
+         
+# Method that converts lat/lon coordinates into x and y in meters for our predefined coordinate system. 
+# See ./docs/analysis_and_discussion.pdf for more details
+def convert_to_coords(lat, lon):
+    x = abs(lon - top_left_corner[1]) * 111320 * np.cos(41.117 * (np.pi/180))
+    y = abs(lat - bottom_right_corner[0]) * 110574
+    return x, y
 
-''' Implementation '''
 
+''' IMPLEMENTATION '''
 
-TOP_THREE = 0
-WEIGHTED_AVG = 1
-LEAST_SQUARES = 2
+def main(argv=None):
 
-METHOD = WEIGHTED_AVG
-
-loop_once = True
-
-while True:
-    
-    scanned_APs = scan_APs()        # List of all access points scanned using the windows wlan api
-    sort_by_distance(scanned_APs)   # Sort by distance
-        
-    
-    AP_DATA = []
-    
-    for known_AP in known_APs:
-        known_BSSID = known_AP[0]
-        
-        for scanned_AP in scanned_APs:
-            scanned_BSSID = scanned_AP[0]
-            
-            if scanned_BSSID == known_BSSID:
-                distance = scanned_AP[1]
-                lat = float(known_AP[1])
-                lon = float(known_AP[2])
-                
-                x, y = convert_to_coords(lat, lon)
-                
-                data = [x, y, distance]
-                AP_DATA.append(data)
-                break
-    
-    if ONLY_SHOW_MATCHES:
+    # Plot all APs on map before scanning (if not only displaying matches)
+    if not ONLY_SHOW_MATCHES:
         x_vals = []
         y_vals = []
-    
-        for AP in AP_DATA:
-            x_vals.append(AP[0])
-            y_vals.append(AP[1])
-            
-        img = plt.imread("C:/Users/Admin/Documents/College/Fall 2022/CS601/Documentation/College_Map_Terrain.png")
+        
+        # Convert known AP lat/lon coords into x and y values on our map
+        for AP in known_APs:
+            x, y = convert_to_coords(AP[1], AP[2])
+            x_vals.append(x)
+            y_vals.append(y)
+
+        img = plt.imread(map_img_path)
         fig, ax = plt.subplots()
+            
         ax.imshow(img, extent=[0, x_max, 0, y_max])
         ax.plot(x_vals, y_vals, 'o', color='red', markersize = 1.5)
+
+    while True:
+        
+        scanned_APs = scan_APs()        # List of all access points scanned using the windows wlan api
+        sort_by_distance(scanned_APs)  
             
-    if len(AP_DATA) < 3:
-        print(f"AP Count {len(AP_DATA)}: Not enough access points detected to determine location")
-    else:
-        if METHOD == WEIGHTED_AVG:
-            combinations = list([list(comb) for comb in itertools.combinations(AP_DATA, 3)])
+        AP_DATA = []
+        
+        # Extract data from scanned APs that match with known APs and store in AP_DATA
+        for known_AP in known_APs:
+            known_BSSID = known_AP[0]
+            
+            for scanned_AP in scanned_APs:
+                scanned_BSSID = scanned_AP[0]
+                
+                # Match found, store in AP_DATA like as a [x, y, distance] tuple
+                if scanned_BSSID == known_BSSID:
+                    distance = scanned_AP[1]
+                    lat = float(known_AP[1])
+                    lon = float(known_AP[2])
+                    
+                    x, y = convert_to_coords(lat, lon)
+                    
+                    data = [x, y, distance]
+                    AP_DATA.append(data)
+                    break
+        
+        # Plot matched APs on map (if only displaying matches)
+        if ONLY_SHOW_MATCHES:
+            x_vals = []
+            y_vals = []
+        
+            for AP in AP_DATA:
+                x_vals.append(AP[0])
+                y_vals.append(AP[1])
+                
+            img = plt.imread(map_img_path)
+            fig, ax = plt.subplots()
+            ax.imshow(img, extent=[0, x_max, 0, y_max])
+            ax.plot(x_vals, y_vals, 'o', color='red', markersize = 1.5)
+        
+        # Stop if < 3 matches found
+        if len(AP_DATA) < 3:
+            print(f"AP Count {len(AP_DATA)}: Not enough access points detected to determine location")
+        # Otherwise, trilaterate user position by finding a weighted average of all 3-group AP combination coordinate estimates
+        else:            
+            combinations = list([list(comb) for comb in itertools.combinations(AP_DATA, 3)])        # Store all combinations of APs in AP_DATA of size 3
             coordinates = []
             
+            # Determine user device coordinate estimate for each 3-group AP combination
             for comb in combinations:
                 user_x, user_y = trilaterate(comb)
                 coordinates.append([user_x, user_y])
@@ -158,6 +160,7 @@ while True:
             total_weight = 0
             n = len(coordinates)
 
+            # Determine weighted average of all coordinates
             for i in range(n):
                 x = coordinates[i][0]
                 y = coordinates[i][1]
@@ -171,35 +174,19 @@ while True:
             x_vals.append(weighted_avg_x)
             y_vals.append(weighted_avg_y)
             
+            # Plot result and print coordinates to console
+
             plt.scatter(x_vals, y_vals)
             plt.show()
             
             print("You are located at {}, {}!".format(weighted_avg_x, weighted_avg_y))
             ax.plot(weighted_avg_x, weighted_avg_y, 'o', color='blue', markersize = 0.5)
+        if not CONTINUOUS_SCAN:
+            break
+        time.sleep(0.2)
 
-        elif METHOD == LEAST_SQUARES:
-            n = len(AP_DATA)
-            sum_x = 0       
-            sum_y = 0
-            sum_xy = 0
-            sum_x2 = 0
-            
-            for AP in AP_DATA:
-                x = AP[0]
-                y = AP[1]
-                
-                sum_x += x       
-                sum_y += y
-                sum_xy += x * y
-                sum_x2 += x * x
-                
-            m = (n * sum_xy - sum_x * sum_y)/(n * sum_x2 - sum_x**2)
-            b = (sum_y - m * sum_x)/n
-            
-    if loop_once:
-        break
-    time.sleep(0.2)
-
+if __name__ == "__main__":
+     sys.exit(main(sys.argv))
 
         
         
