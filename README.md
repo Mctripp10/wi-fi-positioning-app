@@ -1,5 +1,5 @@
 # wi-fi-positioning-app
-Application that attempts to approximate user device location on a map of Westminster College campus by scanning nearby Wi-Fi hotspots. Developed to test the possibility of implementing such a system at Westminster College campus given only the existing network infrastructure. 
+Application that approximates user device location on a map of Westminster College campus by scanning nearby Wi-Fi hotspots. Developed to test the possibility of implementing such a system at Westminster College campus given only the existing network infrastructure. 
 
 Utilizes hotspot signal strength data acquired via the Windows WLAN API to calculate relative distances using the free space path loss (FSPL) formula. Then employs a technique called Wi-Fi trilateration, the same underlying technique behind GPS, to approximate user location given these distances.
 
