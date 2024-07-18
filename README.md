@@ -9,7 +9,7 @@ There are many ways to implement a Wi-Fi positioning system. As I was required t
 1. Gather data for initial setup
    - Exact latitude & longitude coordinates of APs across campus, collected with phone GPS
    - Exact latitude & longitude coordinates of the corners of campus map
-2. Scan for nearby AP data using Winodws WLAN API
+2. Scan for nearby AP data using Windows WLAN API
    - RSSI (received signal strength indicator)
    - BSSID (mac address)
    - SSID (network name)
