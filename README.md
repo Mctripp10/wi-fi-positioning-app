@@ -13,7 +13,7 @@ There are many ways to implement a Wi-Fi positioning system. As I was required t
    - RSSI (received signal strength indicator)
    - BSSID (mac address)
    - SSID (network name)
-3. Use Wi-Fi data to calculate relative distance
+3. Use AP data to calculate relative distance
    - Convert RSSI into approximate distance using the Free Space Path Loss (FSPL) formula
    - Define coordinate plane of college map by converting latitude/longitude coordinates into metric units
 4. Approximate user device location using Wi-Fi trilateration
