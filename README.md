@@ -6,8 +6,19 @@ I had always wondered if there was a way to determine how close you were in rela
 
 # Method
 There are many ways to implement a Wi-Fi positioning system. As I was required to use only the technologies available to me already on campus, my approach relied heavily on access point signal strength:
-1. Utilizes hotspot signal strength data acquired via the Windows WLAN API to calculate relative distances using the free space path loss (FSPL) formula
-2. Employs a technique called Wi-Fi trilateration, the same underlying technique behind GPS, to approximate user location given these distances
+1. Gather data for initial setup
+   - Exact latitude & longitude coordinates of APs across campus, collected with phone GPS
+   - Exact latitude & longitude coordinates of the corners of campus map
+2. Scan for nearby AP data using Winodws WLAN API
+   - RSSI (received signal strength indicator)
+   - BSSID (mac address)
+   - SSID (network name)
+3. Use Wi-Fi data to calculate relative distance
+   - Convert RSSI into approximate distance using the Free Space Path Loss (FSPL) formula
+   - Define coordinate plane of college map by converting latitude/longitude coordinates into metric units
+4. Approximate user device location using Wi-Fi trilateration
+   - Produce one cricle around each AP with radius equal to the distance from the AP to the user's device
+   - Given a minimum of 3 APs, user device location can be found at the intersection of the circles they create
 
 # Results
 
