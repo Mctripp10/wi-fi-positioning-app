@@ -1,6 +1,8 @@
 # Wi-Fi Positioning App
 Wi-Fi positioning system that approximates user device location on a map using signal strength from nearby Wi-Fi access points.
 
+<img src="./resources/wifi-trilateration-img.png" width="750">
+
 ## Motivation
 I had always wondered if there was a way to determine how close you were in relation to Wi-Fi access points based solely on signal strength. The stronger the signal, the closer you should be, right? Well, while there is a relationship between signal strength and distance, it is not perfectly linear (more details on that below). Taking this idea, I wanted to test the possibility of implementing my very own Wi-Fi positioning system at my college campus given only the existing network infrastructure. 
 
@@ -31,7 +33,7 @@ pip install matplotlib
 ## Use Your Own Map
 If you would like to try implementing this WPS yourself at another location, navigate to ```wifi_positioning_app.py``` and configure the following settings:
 1. Upload picture of your location's map to ```map_img_path``` - must fit latitude/longitude range you wish to use perfectly
-2. Record BSSID and latitude/longitude coordinates of at least 3 nearby Wi-Fi access points ```known_APs``` (must be within the range of your map) 
+2. Record BSSID and latitude/longitude coordinates of at least 3 nearby Wi-Fi access points in ```known_APs``` (must be within the range of your map) 
 3. Record latitude/longitude coordinates of the top left and bottom right corner of your map in ```top_left_corner``` and ```bottom_right_corner```
 
 ## Results
