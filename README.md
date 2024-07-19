@@ -37,4 +37,4 @@ If you would like to try implementing this WPS yourself at another location, nav
 ## Results
 Unfortunately, this project did not yield the desired results in accuracy as the phone GPS was not accurate enough to record hotspot locations. The FSPL formula also likely needed to be refined to be more accurate, perhaps with the aid of fingerprinting. Given a technology like a dedicated GPS device to log hotspot positions more accurately and the time to implement fingerprinting, however, I believe this system has a high liklihood of success.
 
-For discussion of results and implementation, please see analysis_and_discussion.pdf
+For discussion of results and implementation, please see ```./docs/analysis_and_discussion.pdf```
