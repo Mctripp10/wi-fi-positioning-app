@@ -25,35 +25,20 @@ from src.trilateration import trilaterate
 
 # Configuration
 
+map_img_path = "./resources/college_map_terrain.png"                # Enter path to map image coordinate plane and AP locations will be projected onto
+top_left_corner = [99.999999, -99.999999]                           # Enter [Latitude, Longitude] coordinate of the top left corner of the map range
+bottom_right_corner = [99.999999, -99.999999]                       # Enter [Latitude, Longitude] coordinate of the bottom right corner of the map range
 ONLY_SHOW_MATCHES = True                                            # Set to TRUE to only show on map the known APs that match to scanned APs, otherwise show all APs
 CONTINUOUS_SCAN = False                                             # Set to TRUE to continuously scan for APs and update user location in real-time, otherwise just scan once for current location
-map_img_path = "./resources/college_map_terrain.png"                # Map image to project coordinate plane with AP locations onto
 
 # List of all known access point MAC addresses (BSSIDs) and lat/lon locations
 known_APs = [
-             ["E8:26:89:1E:06:40", 41.11900, -80.33260],   # MG.b.G03.i
-             ["E8:26:89:1E:06:50", 41.11906, -80.33262],   # MG.AP72
-             ["E8:26:89:1F:1C:10", 41.11893, -80.33279],   # MG.1.101.i 
-             ["E8:26:89:1F:1C:01", 41.11900, -80.33260],   # MG.b.G03.i
-             ["E8:26:89:1D:08:41", 41.11906, -80.33262],   # MG.AP72
-             ["E8:26:89:1D:5F:00", 41.11893, -80.33279],   # MG.1.101.i 
-             
-             ["D0:D3:E0:5B:6F:50", 41.119163, -80.328689],   # H.2.257.i        
-             ["D0:D3:E0:5B:DD:A0", 41.119223, -80.328696],   # h.2.258.i
-             ["D0:D3:E0:5C:EF:30", 41.11960, -80.32853],   # Hoyt.1.130.o
-             ["E8:26:89:1E:35:50", 41.11948, -80.32856],   # H.1.138.i
-             ["D0:D3:E0:5B:56:10", 41.11903, -80.32839],   # H.Chem.1.180.o    
-             ["D0:D3:E0:5B:E7:90", 41.11968, -80.32885],   # H.1.119.i
-             ["D0:D3:E0:5C:AF:70", 41.119170, -80.328735],  # H.2.257.o        
-             ["D0:D3:E0:5C:E6:90", 41.119078, -80.328905],  # H.2.nur.o        
-             ["D0:D3:E0:5B:9D:B0", 41.11921, -80.32865],   # H.1.162.i
-             ["D0:D3:E0:5B:B5:90", 41.11921, -80.32899]    # H.1.ele.o        
+             ["00:00:00:00:00:00", 99.99999, -99.99999],   # Test AP in the format of ["mac address", latitude, longitude]
+             '''Add at least 2 more here'''
              ]
 
 # Convert lat/lon locations of known APs to x and y and plot on coordinate plane
 
-top_left_corner = [41.120140, -80.332992]
-bottom_right_corner = [41.117155, -80.327708]
 x_max = abs(top_left_corner[1] - bottom_right_corner[1]) * 111.320 * np.cos(41.117 * (np.pi/180)) * 1000
 y_max = abs(top_left_corner[0] - bottom_right_corner[0]) * 110.574 * 1000
 
@@ -116,7 +101,7 @@ def main(argv=None):
             for scanned_AP in scanned_APs:
                 scanned_BSSID = scanned_AP[0]
                 
-                # Match found, store in AP_DATA like as a [x, y, distance] tuple
+                # Match found, store in AP_DATA like as a tuple [x, y, distance] 
                 if scanned_BSSID == known_BSSID:
                     distance = scanned_AP[1]
                     lat = float(known_AP[1])
