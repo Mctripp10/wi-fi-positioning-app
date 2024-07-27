@@ -30,7 +30,7 @@ There are many ways to implement a Wi-Fi positioning system. As I was required t
    
 2. Navigate to project directory
    ```
-   cd ../wi-fi-positioning-app
+   cd wi-fi-positioning-app
    ```
    
 3. Install libraries
